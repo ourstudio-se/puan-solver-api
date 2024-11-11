@@ -3,17 +3,15 @@ from pydantic import ConfigDict  # Import ConfigDict in Pydantic V2
 from typing import Optional
 
 class EnvironmentVariables(BaseSettings):
-    
-    # Required settings
-    CELERY_BROKER_URL: str
 
-    # Optional settings
+    # Optional general settings
     VERSION:    str                     = "0.1.0"
     PORT:       int                     = 8000
     LOG_LEVEL:  str                     = "WARNING"
     APP_NAME:   str                     = "ILP_API"
 
-    # Optional settings for computation
+    # Optional computation settings 
+    CELERY_BROKER_URL: Optional[str]    = None
     DEFAULT_COMPUTATION_TIMEOUT: int    = 5 # seconds
     RUN_TASKS_LOCALLY: bool             = False
     WORKER_BATCH_SIZE: int              = 10
