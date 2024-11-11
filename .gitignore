@@ -205,7 +205,6 @@ secret.*.yaml
 # Don't upload pkl
 *.pkl
 
-test_client.py
 puan/
 *.puan
 db/
