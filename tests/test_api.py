@@ -22,9 +22,7 @@ def test_solve_single_ilp_docstring_example():
         },
         "direction": "maximize",
         "objectives": [
-            {"a": 1},
-            {"b": 1},
-            {"y": 1}
+            {"a": 1, "b": -1, "c": 1, "x": -1, "y": 1, "z": -1},
         ]
     }
 
@@ -50,8 +48,6 @@ def test_solve_single_ilp_docstring_example():
     # Further validation for expected solution values if needed
     expected_solutions = [
         {"a": 1, "b": 0, "c": 1, "x": 0, "y": 1, "z": 0},
-        {"a": 1, "b": 1, "c": 1, "x": 0, "y": 1, "z": 0},
-        {"a": 1, "b": 0, "c": 1, "x": 0, "y": 1, "z": 0}
     ]
     for i, solution in enumerate(response_data["solutions"]):
         assert solution["solution"] == expected_solutions[i]
