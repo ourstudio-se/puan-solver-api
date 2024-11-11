@@ -13,7 +13,7 @@ class EnvironmentVariables(BaseSettings):
     # Optional computation settings 
     CELERY_BROKER_URL: Optional[str]    = None
     DEFAULT_COMPUTATION_TIMEOUT: int    = 5 # seconds
-    RUN_TASKS_LOCALLY: bool             = False
+    RUN_TASKS_LOCALLY: bool             = True
     WORKER_BATCH_SIZE: int              = 10
     OBJECTIVE_BATCH_SIZE: int           = 200
     RESULT_EXPIRATION: int              = 3600 # seconds
