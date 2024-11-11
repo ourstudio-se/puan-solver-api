@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "solver-api"
+version = "0.1.1"
+description = "The Integer Linear Programming (ILP) API is a Python-based service designed to provide efficient solutions to integer linear programming problems."
+authors = ["znittzel <rikard@ourstudio.se>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = { version = "^0.115.3", extras = ["standard"] }
+uvicorn = "^0.32.0"
+pydantic = "^2.9.2"
+pydantic-settings = "^2.6.0"
+npycvx = "^0.0.4"
+celery = "^5.4.0"
+redis = "^5.1.0"
+flower = "^2.0.1"
+more-itertools = "^10.5.0"
+loguru = "^0.7.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+httpx = "^0.27.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
