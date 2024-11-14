@@ -32,4 +32,4 @@ COPY . /app
 EXPOSE 8000
 
 USER 65534
-SHELL ["/bin/sh", "-c"]
+ENTRYPOINT ["fastapi", "run", "api.py", "--port", "8000"]
