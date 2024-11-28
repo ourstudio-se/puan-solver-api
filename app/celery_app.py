@@ -8,7 +8,7 @@ env = EnvironmentVariables()
 celery = Celery(
     env.APP_NAME,
     broker=env.CELERY_BROKER_URL,
-    backend=env.CELERY_RESULT_BACKEND,
+    backend=env.CELERY_BROKER_URL if env.CELERY_RESULT_BACKEND is None else env.CELERY_RESULT_BACKEND,
 )
 
 # Optional: Load configuration from a separate module or environment variables
