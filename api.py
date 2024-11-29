@@ -162,5 +162,12 @@ logger.info(f"Worker batch size: {env.WORKER_BATCH_SIZE}")
 logger.info(f"Objective batch size: {env.OBJECTIVE_BATCH_SIZE}")
 logger.info(f"Cache Redis URL: {env.CACHE_REDIS_URL}")
 
+class HealthCheckFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.getMessage().find("/health") == -1 and record.getMessage().find("/ready") == -1
+
+# Filter out healthcheck and readiness check logs
+logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
+
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0", port=env.PORT)
