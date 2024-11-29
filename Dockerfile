@@ -21,6 +21,9 @@ RUN poetry install && rm -rf $POETRY_CACHE_DIR
 
 FROM python:3.12.3-slim AS runtime
 
+LABEL org.opencontainers.image.source=https://github.com/volvo-cars/cce-car-configuration-generator
+LABEL org.opencontainers.image.description="Puan solver api test image"
+
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 

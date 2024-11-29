@@ -39,7 +39,7 @@ async def health_check() -> dict:
 )
 async def readiness_check() -> dict:
     return {"status": "ready"}
-    
+
 @app.post(
     "/model/solve-one/linear",
     response_model=SolveILPResponse,
