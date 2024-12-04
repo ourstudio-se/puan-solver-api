@@ -16,7 +16,7 @@ from celery.exceptions import TimeoutError
 env = EnvironmentVariables()
 
 # Configure logging
-logging.basicConfig(level=getattr(logging, env.LOG_LEVEL, logging.INFO))
+logging.disable(getattr(logging, env.LOG_LEVEL, logging.INFO))
 
 app = FastAPI(
     title="Integer Linear Programming (ILP) API",
