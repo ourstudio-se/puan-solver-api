@@ -43,11 +43,15 @@ def prepare_npycvx(model: Model) -> tuple:
         A_np = np.append(A_np, np.zeros((1, A_np.shape[1]), dtype=np.int64), axis=0)
         b_np = np.append(b_np, 0)
     
-    return npycvx.convert_numpy(
+    result = npycvx.convert_numpy(
         aub=A_np, 
         bub=b_np, 
         int_vrs=set(map(model.columns.index, model.intvars)) if model.intvars else set()
     )
+
+    # Free up memory
+    del A_np, b_np
+    return result
 
 def build_objectives_matrix(objectives: List[Dict[str, int]], model: Model) -> np.ndarray:
 
@@ -148,6 +152,9 @@ async def solve_linear_ilp_dispatched(model: Model, minimize: bool, objectives: 
         ),
         env.WORKER_BATCH_SIZE
     )
+
+    # Release objectives matrix from memory
+    del objectives_mat
 
     # Run all tasks in parallel and return the results
     results = jobs.apply_async(timeout=env.DEFAULT_COMPUTATION_TIMEOUT)

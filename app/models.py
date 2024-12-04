@@ -38,9 +38,12 @@ class SparseMatrix(BaseModel):
     shape: Shape = Field(..., description="Shape of the sparse matrix")
 
     def to_numpy(self) -> np.ndarray:
+
+        # Depend dtype on the maximum value in the matrix
+        dtype = np.int16 if max(self.vals) < 32767 else np.int32
     
         # Create an empty matrix filled with zeros
-        dense_matrix = np.zeros(self.shape.as_tuple(), dtype=np.int64)
+        dense_matrix = np.zeros(self.shape.as_tuple(), dtype=dtype)
         
         # Assign values to the corresponding positions
         dense_matrix[self.rows, self.cols] = self.vals
