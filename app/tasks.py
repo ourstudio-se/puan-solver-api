@@ -15,7 +15,6 @@ from typing import Dict, Tuple, List
 env = EnvironmentVariables()
 logger = get_task_logger(env.APP_NAME)
 
-@functools.lru_cache
 def prepare_npycvx(model: Model) -> tuple:
 
     """
@@ -66,7 +65,8 @@ def build_objectives_matrix(objectives: List[Dict[str, int]], model: Model) -> n
             np.ndarray: The objectives matrix
     """
 
-    obj = np.zeros((len(objectives), len(model.columns)), dtype=np.int64)
+    mx = max(chain(*map(lambda objective: map(abs, objective.values()), objectives)))
+    obj = np.zeros((len(objectives), len(model.columns)), dtype=np.int8 if mx == 1 else (np.int16 if mx < 256 else np.int32))
     for i, objective in enumerate(objectives):
         obj[i, [model.columns.index(k) for k in objective if k in model.columns]] = list(dict(filter(lambda kv: kv[0] in model.columns, objective.items())).values())
     return obj
@@ -117,7 +117,12 @@ def solve_objectives(data: bytes) -> List[Tuple[str, np.ndarray]]:
     nxargs, minimize, objectives = loads(decompress(data))
     
     # The solver function to solve a single objective
-    return [npycvx.solve_lp(*nxargs, minimize, objective) for objective in objectives]
+    result = [npycvx.solve_lp(*nxargs, minimize, objective) for objective in objectives]
+
+    # Delete nxargs to free up memory
+    del nxargs
+
+    return result
 
 async def solve_linear_ilp_dispatched(model: Model, minimize: bool, objectives: List[Dict[str, int]]) -> List[ILPSolution]:
     """
