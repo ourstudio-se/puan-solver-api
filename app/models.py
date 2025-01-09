@@ -40,7 +40,7 @@ class SparseMatrix(BaseModel):
     def to_numpy(self) -> np.ndarray:
 
         # Depend dtype on the maximum value in the matrix
-        mx = max(map(abs, self.vals))
+        mx = max(map(abs, self.vals), default=1)
         dtype = np.int8 if mx < 256 else (np.int16 if mx < 32767 else np.int32)
     
         # Create an empty matrix filled with zeros
@@ -55,7 +55,7 @@ class SparseMatrix(BaseModel):
     def from_numpy(cls, matrix: np.ndarray) -> 'SparseMatrix':
         rows, cols = np.nonzero(matrix)
         vals = matrix[rows, cols]
-        return cls(rows=rows.tolist(), cols=cols.tolist(), vals=vals.tolist(), shape=matrix.shape)
+        return cls(rows=rows.tolist(), cols=cols.tolist(), vals=vals.tolist(), shape=dict(zip(("nrows", "ncols"), matrix.shape)))
 
 class Polyhedron(BaseModel):
     def __hash__(self):  # make hashable BaseModel subclass
