@@ -65,7 +65,7 @@ def build_objectives_matrix(objectives: List[Dict[str, int]], model: Model) -> n
             np.ndarray: The objectives matrix
     """
 
-    mx = max(chain(*map(lambda objective: map(abs, objective.values()), objectives)))
+    mx = max(chain(*map(lambda objective: map(abs, objective.values()), objectives)), default=1)
     obj = np.zeros((len(objectives), len(model.columns)), dtype=np.int8 if mx == 1 else (np.int16 if mx < 256 else np.int32))
     for i, objective in enumerate(objectives):
         obj[i, [model.columns.index(k) for k in objective if k in model.columns]] = list(dict(filter(lambda kv: kv[0] in model.columns, objective.items())).values())
