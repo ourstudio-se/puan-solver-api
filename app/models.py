@@ -40,7 +40,7 @@ class SparseMatrix(BaseModel):
     def to_numpy(self) -> np.ndarray:
 
         # Depend dtype on the maximum value in the matrix
-        mx = max(map(abs, self.vals), default=1)
+        mx = max(map(abs, self.vals), default=1) * 2
         dtype = np.int8 if mx < 256 else (np.int16 if mx < 32767 else np.int32)
     
         # Create an empty matrix filled with zeros
