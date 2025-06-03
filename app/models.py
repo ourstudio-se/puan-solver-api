@@ -57,6 +57,11 @@ class SparseMatrix(BaseModel):
         vals = matrix[rows, cols]
         return cls(rows=rows.tolist(), cols=cols.tolist(), vals=vals.tolist(), shape=dict(zip(("nrows", "ncols"), matrix.shape)))
 
+
+class Variable(BaseModel):
+    id: str = Field(..., description="Unique identifier of the variable")
+    bound: List[int] = Field([0, 1], description="Bounds of the variable, e.g., [0, 1] for binary variables")
+
 class Polyhedron(BaseModel):
     def __hash__(self):  # make hashable BaseModel subclass
         return hash((
@@ -67,6 +72,7 @@ class Polyhedron(BaseModel):
     
     A: SparseMatrix = Field(..., description="`A` sparse matrix of Polyhedron")
     b: List[int] = Field(..., description="`b` vector of Polyhedron")
+    variables: List[Variable] = Field([], description="List of variables in the Polyhedron") 
 
 class Model(BaseModel):
     def __hash__(self):  # make hashable BaseModel subclass
@@ -81,12 +87,31 @@ class Model(BaseModel):
     
     id: Optional[str] = Field(None, description="Unique identifier of Polyhedron")
     polyhedron: Polyhedron = Field(..., description="Polyhedron")
-    columns: List[str] = Field(..., description="Column names of Polyhedron")
-    rows: Optional[List[str]] = Field([], description="Row names of Polyhedron")
-    intvars: Optional[List[str]] = Field(None, description="Integer variables of Polyhedron (boolean is assumed otherwise)")
+    columns: List[str] = Field([], description="Column names of Polyhedron")
+    rows: List[str] = Field([], description="Row names of Polyhedron")
+    intvars: List[str] = Field([], description="Integer variables of Polyhedron (boolean is assumed otherwise)")
 
     def tobytes(self) -> bytes:
         return self.model_dump_json().encode('utf-8')
+    
+    @model_validator(mode='before')
+    def set_columns_from_variables(data: dict):
+        poly_vars = data.get('polyhedron', {}).get('variables', [])
+        poly_A_shape = data.get('polyhedron', {}).get('A', {}).get('shape', {})
+        columns = data.get('columns', [])
+        rows = data.get('rows', [])
+        intvars = data.get('intvars', [])
+
+        if not columns and poly_vars:
+            data['columns'] = [var.get('id') for var in poly_vars]
+        
+        if not rows and poly_A_shape.get('nrows', 0) > 0:
+            data['rows'] = [f"row_{i}" for i in range(poly_A_shape.get('nrows', 0))]
+        
+        if not intvars:
+            data['intvars'] = [var.get('id') for var in poly_vars if not (var.get('bound', [0, 1])[0] == 0 and var.get('bound', [0, 1])[1] == 1)]
+        
+        return data
 
     @model_validator(mode='after')
     def check_columns(self):
@@ -106,7 +131,7 @@ class RetrieveModelResponse(BaseModel):
 
 class SolveILPRequest(BaseModel):
     direction: Direction = Field(..., description="Direction of the optimization")
-    objectives: List[Dict[str, int]] = Field(..., description="Objectives to maximize or minimize")
+    objectives: List[Dict[str, float]] = Field(..., description="Objectives to maximize or minimize")
     solver: Optional[Solver] = Field(Solver.default, description="Solver to use")
 
 class ILPSolution(BaseModel):
@@ -121,7 +146,7 @@ class ErrorResponse(BaseModel):
 
 class Problem(BaseModel):
     model: Model = Field(..., description="Polyhedron model")
-    objectives: List[Dict[str, int]] = Field(..., description="Objectives to maximize or minimize")
+    objectives: List[Dict[str, float]] = Field(..., description="Objectives to maximize or minimize")
     direction: Direction = Field(..., description="Direction of the optimization")
     solver: Solver = Field(Solver.default, description="Solver to use")
 
