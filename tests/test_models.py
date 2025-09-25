@@ -54,16 +54,93 @@ def test_empty_matrix():
     expected_empty = np.zeros((3, 3), dtype=np.int8)
     np.testing.assert_array_equal(dense_matrix, expected_empty)
 
-def test_dtype_selection():
+def test_dtype_selection_large_value_selects_int32():
     large_vals = [10, 200, 40000]
-    large_sparse_matrix = SparseMatrix(
+    sparse_matrix = SparseMatrix(
         rows=[0, 1, 2],
         cols=[0, 1, 2],
         vals=large_vals,
         shape={"nrows": 3, "ncols": 3}
     )
-    dense_matrix = large_sparse_matrix.to_numpy()
+    dense_matrix = sparse_matrix.to_numpy()
     assert dense_matrix.dtype == np.int32
+
+def test_dtype_selection_negative_large_value_selects_int32():
+    large_vals = [10, 200, -40000]
+    sparse_matrix = SparseMatrix(
+        rows=[0, 1, 2],
+        cols=[0, 1, 2],
+        vals=large_vals,
+        shape={"nrows": 3, "ncols": 3}
+    )
+    dense_matrix = sparse_matrix.to_numpy()
+    assert dense_matrix.dtype == np.int32
+
+def test_dtype_selection_medium_value_higher_limit_selects_int16():
+    medium_vals = [10, 20, 32766]
+    sparse_matrix = SparseMatrix(
+        rows=[0, 1, 2],
+        cols=[0, 1, 2],
+        vals=medium_vals,
+        shape={"nrows": 3, "ncols": 3}
+    )
+    dense_matrix = sparse_matrix.to_numpy()
+    assert dense_matrix.dtype == np.int16
+
+def test_dtype_selection_medium_value_lower_limit_selects_int16():
+    medium_vals = [10, 20, 128]
+    sparse_matrix = SparseMatrix(
+        rows=[0, 1, 2],
+        cols=[0, 1, 2],
+        vals=medium_vals,
+        shape={"nrows": 3, "ncols": 3}
+    )
+    dense_matrix = sparse_matrix.to_numpy()
+    assert dense_matrix.dtype == np.int16
+
+def test_dtype_selection_negative_medium_value_higher_limit_selects_int16():
+    medium_vals = [10, 20, -32766]
+    sparse_matrix = SparseMatrix(
+        rows=[0, 1, 2],
+        cols=[0, 1, 2],
+        vals=medium_vals,
+        shape={"nrows": 3, "ncols": 3}
+    )
+    dense_matrix = sparse_matrix.to_numpy()
+    assert dense_matrix.dtype == np.int16
+
+def test_dtype_selection_negative_medium_value_lower_limit_selects_int16():
+    medium_vals = [10, 20, -128]
+    sparse_matrix = SparseMatrix(
+        rows=[0, 1, 2],
+        cols=[0, 1, 2],
+        vals=medium_vals,
+        shape={"nrows": 3, "ncols": 3}
+    )
+    dense_matrix = sparse_matrix.to_numpy()
+    assert dense_matrix.dtype == np.int16
+
+def test_dtype_selection_small_values_selects_int8():
+    small_vals = [10, 20, 126]
+    sparse_matrix = SparseMatrix(
+        rows=[0, 1, 2],
+        cols=[0, 1, 2],
+        vals=small_vals,
+        shape={"nrows": 3, "ncols": 3}
+    )
+    dense_matrix = sparse_matrix.to_numpy()
+    assert dense_matrix.dtype == np.int8
+
+def test_dtype_selection_negative_small_values_selects_int8():
+    small_vals = [10, 20, -126]
+    sparse_matrix = SparseMatrix(
+        rows=[0, 1, 2],
+        cols=[0, 1, 2],
+        vals=small_vals,
+        shape={"nrows": 3, "ncols": 3}
+    )
+    dense_matrix = sparse_matrix.to_numpy()
+    assert dense_matrix.dtype == np.int8
 
 def test_invalid_inputs():
     with pytest.raises(ValidationError):
