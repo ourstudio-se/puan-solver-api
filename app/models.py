@@ -96,8 +96,16 @@ class Model(BaseModel):
     
     @model_validator(mode='before')
     def set_columns_from_variables(data: dict):
-        poly_vars = data.get('polyhedron', {}).get('variables', [])
-        poly_A_shape = data.get('polyhedron', {}).get('A', {}).get('shape', {})
+        polyhedron = data.get('polyhedron', {})
+        if isinstance(polyhedron, dict):
+            poly_vars = polyhedron.get('variables', [])
+            poly_A_shape = polyhedron.get('A', {}).get('shape', {})
+        else:
+            poly_vars = polyhedron.variables
+            poly_A_shape = {
+                "nrows": polyhedron.A.shape.nrows,
+                "ncols": polyhedron.A.shape.ncols
+            }
         columns = data.get('columns', [])
         rows = data.get('rows', [])
         intvars = data.get('intvars', [])
